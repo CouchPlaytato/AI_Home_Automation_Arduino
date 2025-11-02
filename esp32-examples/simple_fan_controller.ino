@@ -42,6 +42,10 @@ void setup() {
 }
 
 void loop() {
+  // if(!fanOn){
+  //   turnFanOn();
+  //   fanOn = true;
+  // }
   // Check for serial commands from Node.js
   if (Serial.available()) {
     String jsonString = Serial.readStringUntil('\n');
@@ -108,7 +112,7 @@ void turnFanOn() {
   
   // If no speed set, use speed 1 as default
   if (currentSpeed == 0) {
-    setFanSpeed(1);
+    setFanSpeed(3);
   } else {
     applyPWM();
   }
