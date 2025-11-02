@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voice Fan Controller</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .section {
+            margin-bottom: 30px;
+            padding: 25px;
+            border: 2px solid #f0f0f0;
+            border-radius: 10px;
+            background: #fafafa;
+        }
+        
+        .section h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .voice-section {
+            text-align: center;
+        }
+        
+        .record-button {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: none;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+            margin: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+        
+        .record-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(102, 126, 234, 0.4);
+        }
+        
+        .record-button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .recording {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24) !important;
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .button {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1em;
+            margin: 10px 5px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        .button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .input-group {
+            margin-bottom: 15px;
+        }
+        
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .input-group input, .input-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s ease;
+        }
+        
+        .input-group input:focus, .input-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .response {
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 8px;
+            min-height: 50px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        
+        .response.success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        
+        .response.error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        
+        .response.info {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+        
+        .status-online {
+            background: #28a745;
+            box-shadow: 0 0 10px rgba(40, 167, 69, 0.5);
+        }
+        
+        .status-offline {
+            background: #dc3545;
+        }
+        
+        .commands {
+            background: #e9ecef;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            font-family: monospace;
+            font-size: 0.9em;
+        }
+        
+        .mic-icon {
+            font-size: 2em;
+            margin-bottom: 5px;
+        }
+        
+        .timer {
+            font-size: 0.9em;
+            opacity: 0.8;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎤 Voice Fan Controller</h1>
+            <p>ESP32 Home Automation via Gemini AI</p>
+            <p>
+                <span id="statusIndicator" class="status-indicator status-offline"></span>
+                <span id="statusText">Checking connection...</span>
+            </p>
+        </div>
+        
+        <div class="content">
+            <!-- Voice Recording Section -->
+            <div class="section voice-section">
+                <h2>🎙️ Voice Commands</h2>
+                <p>Click the microphone to record your voice command</p>
+                
+                <button id="recordBtn" class="record-button">
+                    <div class="mic-icon">🎤</div>
+                    <div>Record</div>
+                </button>
+                
+                <div id="timer" class="timer" style="display: none;">Recording: 0s</div>
+                
+                <div class="commands">
+                    <strong>Try these commands:</strong><br>
+                    • "Fan on" / "Turn fan on"<br>
+                    • "Fan off" / "Turn fan off"<br>
+                    • "Fan speed 1" to "Fan speed 5"<br>
+                    • "Set fan speed to 3"
+                </div>
+                
+                <div id="voiceResponse" class="response" style="display: none;"></div>
+            </div>
+            
+            <!-- Text Input Section -->
+            <div class="section">
+                <h2>💬 Text Commands</h2>
+                <p>Type commands directly for testing</p>
+                
+                <div class="input-group">
+                    <label for="textMessage">Command:</label>
+                    <input type="text" id="textMessage" placeholder="Type: fan on, fan speed 3, fan off...">
+                </div>
+                
+                <button id="sendTextBtn" class="button">Send Command</button>
+                
+                <div id="textResponse" class="response" style="display: none;"></div>
+            </div>
+            
+            <!-- Status Section -->
+            <div class="section">
+                <h2>📊 System Status</h2>
+                <div id="systemStatus">
+                    <p><strong>Server:</strong> <span id="serverStatus">Checking...</span></p>
+                    <p><strong>ESP32:</strong> <span id="esp32Status">Not connected</span></p>
+                    <p><strong>Gemini AI:</strong> <span id="geminiStatus">Ready</span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let mediaRecorder;
+        let audioChunks = [];
+        let isRecording = false;
+        let recordingTimer;
+        let recordingTime = 0;
+
+        // DOM elements
+        const recordBtn = document.getElementById('recordBtn');
+        const sendTextBtn = document.getElementById('sendTextBtn');
+        const statusIndicator = document.getElementById('statusIndicator');
+        const statusText = document.getElementById('statusText');
+        const timer = document.getElementById('timer');
+
+        // Check server status
+        async function checkServerStatus() {
+            try {
+                const response = await fetch('/health');
+                if (response.ok) {
+                    statusIndicator.className = 'status-indicator status-online';
+                    statusText.textContent = 'Server Online';
+                    document.getElementById('serverStatus').textContent = 'Online';
+                } else {
+                    throw new Error('Server not responding');
+                }
+            } catch (error) {
+                statusIndicator.className = 'status-indicator status-offline';
+                statusText.textContent = 'Server Offline';
+                document.getElementById('serverStatus').textContent = 'Offline';
+            }
+        }
+
+        // Initialize microphone
+        async function initializeMicrophone() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ 
+                    audio: {
+                        sampleRate: 44100,
+                        channelCount: 1,
+                        echoCancellation: true,
+                        noiseSuppression: true
+                    } 
+                });
+                
+                mediaRecorder = new MediaRecorder(stream, {
+                    mimeType: 'audio/webm;codecs=opus'
+                });
+                
+                mediaRecorder.ondataavailable = (event) => {
+                    audioChunks.push(event.data);
+                };
+                
+                mediaRecorder.onstop = () => {
+                    processRecording();
+                };
+                
+                recordBtn.disabled = false;
+                console.log('Microphone initialized successfully');
+            } catch (error) {
+                console.error('Microphone error:', error);
+                showResponse('voiceResponse', 'Microphone access denied. Please allow microphone access and refresh the page.', 'error');
+                recordBtn.textContent = 'Mic Access Denied';
+                recordBtn.disabled = true;
+            }
+        }
+
+        // Recording functions
+        function startRecording() {
+            if (!mediaRecorder) return;
+            
+            audioChunks = [];
+            recordingTime = 0;
+            mediaRecorder.start();
+            isRecording = true;
+            
+            recordBtn.classList.add('recording');
+            recordBtn.innerHTML = '<div class="mic-icon">⏹️</div><div>Stop</div>';
+            
+            timer.style.display = 'block';
+            recordingTimer = setInterval(() => {
+                recordingTime++;
+                timer.textContent = `Recording: ${recordingTime}s`;
+            }, 1000);
+            
+            showResponse('voiceResponse', 'Recording... Speak your command now!', 'info');
+            
+            // Auto stop after 10 seconds
+            setTimeout(() => {
+                if (isRecording) stopRecording();
+            }, 10000);
+        }
+
+        function stopRecording() {
+            if (!mediaRecorder || !isRecording) return;
+            
+            mediaRecorder.stop();
+            isRecording = false;
+            
+            recordBtn.classList.remove('recording');
+            recordBtn.innerHTML = '<div class="mic-icon">🎤</div><div>Record</div>';
+            
+            timer.style.display = 'none';
+            clearInterval(recordingTimer);
+            
+            showResponse('voiceResponse', 'Processing audio...', 'info');
+        }
+
+        async function processRecording() {
+            const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+            const formData = new FormData();
+            formData.append('audio', audioBlob, 'recording.webm');
+
+            try {
+                showResponse('voiceResponse', 'Sending to Gemini AI...', 'info');
+                
+                const response = await fetch('/voice', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    let responseText = `🎤 You said: "${result.transcription}"\n\n`;
+                    
+                    // Use finalCommand if available, otherwise fall back to originalCommand
+                    const command = result.finalCommand || result.originalCommand;
+                    
+                    if (command) {
+                        responseText += `🔧 Command: ${command.device} → ${command.action}`;
+                        if (command.value) {
+                            responseText += ` (${command.value})`;
+                        }
+                        responseText += `\nConfidence: ${command.confidence}\n\n`;
+                    } else {
+                        responseText += `🔧 Command: No valid command detected\n\n`;
+                    }
+                    
+                    responseText += `🤖 AI Response: ${result.response}\n\n`;
+                    responseText += `📡 ESP32: ${result.esp32Sent ? 'Command sent ✅' : 'Not sent (no ESP32) ❌'}`;
+                    
+                    showResponse('voiceResponse', responseText, 'success');
+                    
+                    // Update ESP32 status
+                    document.getElementById('esp32Status').textContent = result.esp32Sent ? 'Connected' : 'Not connected';
+                } else {
+                    showResponse('voiceResponse', `Error: ${result.error}`, 'error');
+                }
+            } catch (error) {
+                showResponse('voiceResponse', `Network Error: ${error.message}`, 'error');
+            }
+        }
+
+        // Text message function
+        async function sendTextMessage() {
+            const message = document.getElementById('textMessage').value.trim();
+            if (!message) {
+                showResponse('textResponse', 'Please enter a command', 'error');
+                return;
+            }
+
+            sendTextBtn.disabled = true;
+            sendTextBtn.textContent = 'Sending...';
+            
+            showResponse('textResponse', 'Processing command...', 'info');
+
+            try {
+                const response = await fetch('/text', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ message })
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    let responseText = `💬 Command: "${result.message}"\n\n`;
+                    
+                    // Use finalCommand if available, otherwise fall back to originalCommand
+                    const command = result.finalCommand || result.originalCommand;
+                    
+                    if (command) {
+                        responseText += `🔧 Parsed: ${command.device} → ${command.action}`;
+                        if (command.value) {
+                            responseText += ` (${command.value})`;
+                        }
+                        responseText += `\nConfidence: ${command.confidence}\n\n`;
+                    } else {
+                        responseText += `🔧 Parsed: No valid command detected\n\n`;
+                    }
+                    
+                    responseText += `🤖 AI Response: ${result.response}\n\n`;
+                    responseText += `📡 ESP32: ${result.esp32Sent ? 'Command sent ✅' : 'Not sent (no ESP32) ❌'}`;
+                    
+                    showResponse('textResponse', responseText, 'success');
+                    
+                    // Update ESP32 status
+                    document.getElementById('esp32Status').textContent = result.esp32Sent ? 'Connected' : 'Not connected';
+                } else {
+                    showResponse('textResponse', `Error: ${result.error}`, 'error');
+                }
+            } catch (error) {
+                showResponse('textResponse', `Network Error: ${error.message}`, 'error');
+            } finally {
+                sendTextBtn.disabled = false;
+                sendTextBtn.textContent = 'Send Command';
+            }
+        }
+
+        function showResponse(elementId, message, type) {
+            const element = document.getElementById(elementId);
+            element.textContent = message;
+            element.className = `response ${type}`;
+            element.style.display = 'block';
+        }
+
+        // Event listeners
+        recordBtn.addEventListener('click', () => {
+            if (isRecording) {
+                stopRecording();
+            } else {
+                startRecording();
+            }
+        });
+        
+        sendTextBtn.addEventListener('click', sendTextMessage);
+
+        // Enter key listener
+        document.getElementById('textMessage').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendTextMessage();
+            }
+        });
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            checkServerStatus();
+            initializeMicrophone();
+            
+            // Check server status every 30 seconds
+            setInterval(checkServerStatus, 30000);
+        });
+    </script>
+</body>
+</html>

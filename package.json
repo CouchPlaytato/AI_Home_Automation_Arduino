@@ -1,0 +1,33 @@
+{
+  "name": "voice-gemini-server",
+  "version": "1.0.0",
+  "description": "Voice-to-Gemini server for ESP32 home automation",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "multer": "^1.4.5-lts.1",
+    "cors": "^2.8.5",
+    "@google/generative-ai": "^0.21.0",
+    "dotenv": "^16.4.5",
+    "fs-extra": "^11.2.0",
+    "path": "^0.12.7",
+    "serialport": "^12.0.0",
+    "@serialport/parser-readline": "^12.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  },
+  "keywords": [
+    "voice",
+    "gemini",
+    "esp32",
+    "home-automation",
+    "speech-to-text"
+  ],
+  "author": "Your Name",
+  "license": "MIT"
+}
